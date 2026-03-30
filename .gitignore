@@ -1,0 +1,21 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Database
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Uploads
+public/uploads/
+
+# SQLite
+*.sqlite
+*.sqlite3

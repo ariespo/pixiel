@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -type f -name *.py -o -name *.js -o -name *.ts -o -name *.json)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls -la src/services/ src/components/*.tsx src/hooks/*.ts)",
+      "Bash(ls -la H:/chat*.png)",
+      "Read(//h//**)",
+      "Bash(ls -la *.png)",
+      "Bash(ls -la *.json)",
+      "Bash(find H:chat -maxdepth 1 -name *.json -type f)",
+      "Bash(npm run:*)",
+      "Bash(find /h/chat -maxdepth 2 -name *.json -type f)",
+      "Bash(sqlite3 data/app.db \".schema presets\")",
+      "Bash(pkill -f \"tsx\")",
+      "Bash(pkill -f \"node.*server\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(cmd.exe /c \"del /f /q data\\\\app.db data\\\\app.db-shm data\\\\app.db-wal 2>nul & dir data\\\\\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":3001\")",
+      "Bash(taskkill /PID 49100 /F)",
+      "Bash(taskkill /PID 31880 /F)",
+      "Bash(tasklist)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(npx tsx:*)",
+      "Bash(ls -la H:chat.env*)",
+      "Bash(H:chat.env.example:*)",
+      "Bash(H:chatstart.bat:*)",
+      "WebFetch(domain:www.free-api.com)",
+      "Bash(find /h -name Cargo.toml -type f)",
+      "Bash(find /h/chat -name *.rs -type f)"
+    ]
+  }
+}
