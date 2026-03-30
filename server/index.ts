@@ -34,6 +34,16 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Serve Imported_Preset.json for auto-import
+app.get('/Imported_Preset.json', (req, res) => {
+  const presetPath = path.join(process.cwd(), 'Imported_Preset.json');
+  if (fs.existsSync(presetPath)) {
+    res.sendFile(presetPath);
+  } else {
+    res.status(404).json({ error: 'Preset file not found' });
+  }
+});
+
 // API routes
 app.use('/api/chat', chatRoutes);
 app.use('/api/presets', presetRoutes);

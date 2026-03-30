@@ -32,7 +32,8 @@ RUN npm ci --production && npm install tsx && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
 
-# Copy Imported_Preset.json for auto-import feature (put in dist so it's served statically)
+# Copy Imported_Preset.json for auto-import feature (serve via API and static)
+COPY --from=builder /app/Imported_Preset.json ./Imported_Preset.json
 COPY --from=builder /app/Imported_Preset.json ./dist/Imported_Preset.json
 
 # Create data and uploads directories (they are not in builder due to .gitignore)
