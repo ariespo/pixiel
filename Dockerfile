@@ -31,13 +31,12 @@ RUN npm ci --production && npm install tsx && npm cache clean --force
 # Copy built frontend and server files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
-COPY --from=builder /app/data ./data
 
 # Copy Imported_Preset.json for auto-import feature
 COPY --from=builder /app/Imported_Preset.json ./Imported_Preset.json
 
-# Create uploads directory
-RUN mkdir -p public/uploads
+# Create data and uploads directories (they are not in builder due to .gitignore)
+RUN mkdir -p data public/uploads
 
 # Expose port
 EXPOSE 3001
