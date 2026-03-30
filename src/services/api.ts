@@ -60,13 +60,29 @@ export const chatApi = {
     return res.json();
   },
 
-  // Add message
+  // Add message (with auto-recreate session if not found - for Render free tier)
   addMessage: async (sessionId: string, role: 'user' | 'assistant' | 'system', content: string, metadata?: any, createdAt?: number) => {
     const res = await fetch(`${API_BASE}/chat/sessions/${sessionId}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, content, metadata, ...(createdAt !== undefined && { created_at: createdAt }) })
     });
+
+    // If session not found (404), recreate it (Render free tier workaround)
+    if (res.status === 404) {
+      console.warn('[API] Session not found, recreating...');
+      // Create new session
+      const newSession = await chatApi.createSession('与夏目的初次相遇');
+      // Retry adding message to new session
+      const retryRes = await fetch(`${API_BASE}/chat/sessions/${newSession.id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, content, metadata, ...(createdAt !== undefined && { created_at: createdAt }) })
+      });
+      if (!retryRes.ok) throw new Error('Failed to add message after recreating session');
+      return retryRes.json();
+    }
+
     if (!res.ok) throw new Error('Failed to add message');
     return res.json();
   },
