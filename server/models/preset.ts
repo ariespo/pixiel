@@ -600,11 +600,36 @@ export class PresetModel {
   }
 
   // Build system prompt from enabled prompt entries
-  static buildSystemPrompt(preset: ChatCompletionPreset): string {
+  // Supports World Info / Lorebook style keyword triggering
+  static buildSystemPrompt(preset: ChatCompletionPreset, context?: {
+    userMessage?: string;
+    history?: Array<{ role: string; content: string }>;
+  }): string {
     if (!preset.prompt_entries?.length) return '';
 
+    // Build context text for keyword matching
+    const contextText = context
+      ? [
+          context.userMessage || '',
+          ...(context.history || []).slice(-10).map(h => h.content) // Last 10 messages
+        ].join(' ')
+      : '';
+
     const enabledEntries = preset.prompt_entries
-      .filter(e => e.enabled && !e.marker) // Exclude markers
+      .filter(e => {
+        if (!e.enabled || e.marker) return false;
+
+        // If entry has injection_trigger, only include if keywords match
+        if (e.injection_trigger && e.injection_trigger.length > 0) {
+          const matched = e.injection_trigger.some(keyword =>
+            contextText.toLowerCase().includes(keyword.toLowerCase())
+          );
+          return matched;
+        }
+
+        // No trigger = always include (traditional prompt entry)
+        return true;
+      })
       .sort((a, b) => a.position - b.position);
 
     return enabledEntries
@@ -638,8 +663,11 @@ export class PresetModel {
   }): Array<{ role: string; content: string; name?: string }> {
     const messages: Array<{ role: string; content: string; name?: string }> = [];
 
-    // System message from preset prompt entries
-    const systemContent = this.buildSystemPrompt(preset) || options.systemPrompt || '';
+    // System message from preset prompt entries (with World Info keyword matching)
+    const systemContent = this.buildSystemPrompt(preset, {
+      userMessage: options.userMessage,
+      history: options.history
+    }) || options.systemPrompt || '';
     if (systemContent) {
       messages.push({ role: 'system', content: systemContent });
     }

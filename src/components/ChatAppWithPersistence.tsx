@@ -44,12 +44,15 @@ const cleanChatTags = (content: string): string => {
 };
 
 /**
- * Remove role prefix like [夏目 (AI)]: or [小明 (用户)]:
+ * Remove role prefix like [夏目 (AI)]: or [小明 (用户)]: or [时间] 角色 (AI):
  * LLM may echo the formatted prefix from history examples
  */
 const cleanRolePrefix = (content: string): string => {
-  // Match patterns like: [夏目 (AI)]: [2026-03-25 10:30] 夏目 (AI):  etc.
-  let cleaned = content.replace(/^\[.+?\)\]:\s*/g, '');
+  // Match patterns like:
+  // [2026-03-30 12:59] 夏目 (AI): 内容
+  // [夏目 (AI)]: 内容
+  let cleaned = content.replace(/^\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}\]\s*\[?[^\[\]]*?\(AI\)\]?:\s*/g, '');
+  cleaned = cleaned.replace(/^\[.+?\)\]:\s*/g, '');
   cleaned = cleaned.replace(/^\[.+?\]\s*/g, '');
   return cleaned.trim();
 };

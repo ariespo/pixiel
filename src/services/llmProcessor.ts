@@ -135,12 +135,13 @@ export function extractCompleteChatBlocks(buffer: string, isFinal = false): {
     remaining = remaining.replace(match[0], '');
   }
 
-  // Match lines with [Name (AI)]: prefix and treat as chat messages
+  // Match lines with [时间] 角色 (AI): 内容 or [角色 (AI)]: 内容 format
   // In streaming mode: only extract lines ending with \n (complete lines)
   // In final mode: also extract lines without \n (final content)
   if (isFinal) {
-    // Final mode: extract all [Name (AI)]: lines (with or without newline)
-    const rolePrefixRegexFinal = /^\[.+?\s*\(AI\)\]:\s*(.+?)$/gm;
+    // Final mode: extract all AI role lines (with or without newline)
+    // Matches: [2026-03-30 12:59] 夏目 (AI): 内容 or [夏目 (AI)]: 内容
+    const rolePrefixRegexFinal = /^(?:\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}\])?\s*\[?[^[\]]*?\(AI\)\]?:\s*(.+?)$/gm;
     while ((match = rolePrefixRegexFinal.exec(remaining)) !== null) {
       const content = match[1].trim();
       if (content) {
@@ -151,7 +152,7 @@ export function extractCompleteChatBlocks(buffer: string, isFinal = false): {
     }
   } else {
     // Streaming mode: only extract complete lines (ending with \n)
-    const rolePrefixRegex = /^\[.+?\s*\(AI\)\]:\s*(.+?)\n/gm;
+    const rolePrefixRegex = /^(?:\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}\])?\s*\[?[^[\]]*?\(AI\)\]?:\s*(.+?)\n/gm;
     while ((match = rolePrefixRegex.exec(remaining)) !== null) {
       const content = match[1].trim();
       if (content) {
@@ -357,12 +358,16 @@ export function getContentBeforeThink(text: string): string {
 }
 
 /**
- * Remove role prefix like [夏目 (AI)]: or [小明 (用户)]:
+ * Remove role prefix like [夏目 (AI)]: or [小明 (用户)]: or [时间] 角色 (AI):
  * LLM may echo the formatted prefix from history examples
  */
 function cleanRolePrefix(content: string): string {
-  // Match patterns like: [夏目 (AI)]: [2026-03-25 10:30] 夏目 (AI):  etc.
-  let cleaned = content.replace(/^\[.+?\)\]:\s*/g, '');
+  // Match patterns like:
+  // [2026-03-30 12:59] 夏目 (AI): 内容
+  // [夏目 (AI)]: 内容
+  // [2026-03-25 10:30] 等
+  let cleaned = content.replace(/^\[\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}\]\s*\[?[^\[\]]*?\(AI\)\]?:\s*/g, '');
+  cleaned = cleaned.replace(/^\[.+?\)\]:\s*/g, '');
   cleaned = cleaned.replace(/^\[.+?\]\s*/g, '');
   return cleaned.trim();
 }

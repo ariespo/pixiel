@@ -499,6 +499,11 @@ function PresetEditor({ preset, onSave, onCancel }: EditorProps) {
                         </span>
                         {entry.marker && <span className="text-xs text-amber-400">[标记]</span>}
                         {entry.identifier && <span className="text-xs text-coffee-400">({entry.identifier})</span>}
+                        {entry.injection_trigger && entry.injection_trigger.length > 0 && (
+                          <span className="text-xs text-green-400" title={`触发词: ${entry.injection_trigger.join(', ')}`}>
+                            📚 {entry.injection_trigger.length}个触发词
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-1">
                         <button
@@ -579,11 +584,27 @@ function PresetEditor({ preset, onSave, onCancel }: EditorProps) {
                           className="w-full pixel-border-inset p-2 bg-coffee-800 text-coffee-100 text-sm"
                           placeholder="标识符 (identifier)"
                         />
+                        {/* World Book / Knowledge Book Trigger Keywords */}
+                        <input
+                          type="text"
+                          value={entry.injection_trigger?.join(', ') || ''}
+                          onChange={(e) => {
+                            const keywords = e.target.value
+                              .split(/[,，]/)
+                              .map(k => k.trim())
+                              .filter(Boolean);
+                            updatePromptEntry(entry.id, {
+                              injection_trigger: keywords.length > 0 ? keywords : undefined
+                            });
+                          }}
+                          className="w-full pixel-border-inset p-2 bg-coffee-800 text-amber-400 text-sm"
+                          placeholder="世界书触发关键词（用逗号分隔，如: 咖啡店, 老板娘）"
+                        />
                         <textarea
                           value={entry.content}
                           onChange={(e) => updatePromptEntry(entry.id, { content: e.target.value })}
                           className="w-full pixel-border-inset p-2 bg-coffee-800 text-coffee-100 text-sm h-32 resize-none"
-                          placeholder="提示词内容..."
+                          placeholder="提示词内容（触发时注入）..."
                         />
                       </div>
                     )}

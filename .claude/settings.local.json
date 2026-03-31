@@ -29,7 +29,9 @@
       "Bash(H:chatstart.bat:*)",
       "WebFetch(domain:www.free-api.com)",
       "Bash(find /h -name Cargo.toml -type f)",
-      "Bash(find /h/chat -name *.rs -type f)"
+      "Bash(find /h/chat -name *.rs -type f)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"feat: World Book / 知识书 / 创意工坊功能:*)"
     ]
   }
 }
